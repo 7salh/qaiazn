@@ -2,184 +2,105 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home</title>
+<title>الأسئلة</title>
 </head>
 <body>
 
-<h2>الصفحة الرئيسية</h2>
+<h2>استبيان</h2>
 
-<p id="welcome"></p>
+<label>الجنس</label><br>
+<select id="gender">
+  <option value="">اختر</option>
+  <option value="male">ذكر</option>
+  <option value="female">أنثى</option>
+</select>
+<br><br>
 
-<label>اسم المسلسل</label><br>
-<input type="text" id="seriesName"><br><br>
+<label>العمر</label><br>
+<input type="number" id="age"><br><br>
 
-<label>الحلقة</label><br>
-<select id="episode">
-    <option value="">اختر الحلقة</option>
-</select><br><br>
+<label>الحالة الاجتماعية</label><br>
+<select id="status">
+  <option value="">اختر</option>
+  <option value="single">أعزب</option>
+  <option value="married">متزوج</option>
+</select>
+<br><br>
 
-<label>الموسم</label><br>
-<input type="number" id="season"><br><br>
+<div id="childrenBox" style="display:none;">
+<label>عدد الأبناء</label><br>
+<input type="number" id="children"><br><br>
+</div>
 
-<label>ملاحظات</label><br>
-<textarea id="notes" maxlength="250" rows="5" cols="40"></textarea><br><br>
+<hr>
 
-<button id="saveBtn">حفظ البيانات</button>
-<button id="logoutBtn">تسجيل خروج</button>
+<p>كيف تصف حالتك النفسية اليوم؟</p>
+<input type="text" id="q1"><br><br>
 
-<p id="status"></p>
+<p>هل تفضل مشاركة مشاعرك مع الآخرين؟</p>
+<input type="text" id="q2"><br><br>
+
+<p>هل تعاني من ضغوط متكررة؟</p>
+<input type="text" id="q3"><br><br>
+
+<p>هل تجد صعوبة في التعبير عن مشاعرك؟</p>
+<input type="text" id="q4"><br><br>
+
+<button id="save">حفظ</button>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAxjQs2ujCOdp78runJQW8GJBOc5i0kloc",
-  authDomain: "qaiazn.firebaseapp.com",
-  projectId: "qaiazn",
-  storageBucket: "qaiazn.firebasestorage.app",
-  messagingSenderId: "944780637686",
-  appId: "1:944780637686:web:5d30ca54a2bc76ec7b43d7"
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+document.getElementById("status").addEventListener("change", function () {
+  document.getElementById("childrenBox").style.display =
+    this.value === "married" ? "block" : "none";
+});
 
 let currentUser = null;
 
-// تعبئة قائمة الحلقات من 1 إلى 100
-const episodeSelect = document.getElementById("episode");
-
-for (let i = 1; i <= 100; i++) {
-  const option = document.createElement("option");
-  option.value = i;
-  option.textContent = i;
-  episodeSelect.appendChild(option);
-}
-
-onAuthStateChanged(auth, async (user) => {
-
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
-
+onAuthStateChanged(auth, (user) => {
   currentUser = user;
+});
 
-  document.getElementById("welcome").innerText =
-    "مرحباً " + (user.displayName || user.email);
+document.getElementById("save").addEventListener("click", async () => {
+
+  if (!currentUser) {
+    alert("يجب تسجيل الدخول");
+    return;
+  }
+
+  const data = {
+    gender: document.getElementById("gender").value,
+    age: document.getElementById("age").value,
+    status: document.getElementById("status").value,
+    children: document.getElementById("children").value || 0,
+    q1: document.getElementById("q1").value,
+    q2: document.getElementById("q2").value,
+    q3: document.getElementById("q3").value,
+    q4: document.getElementById("q4").value,
+    updatedAt: new Date().toISOString()
+  };
 
   try {
-
-    const docRef = doc(db, "users", user.uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-
-      const data = docSnap.data();
-
-      document.getElementById("seriesName").value =
-        data.seriesName || "";
-
-      document.getElementById("episode").value =
-        data.episode || "";
-
-      document.getElementById("season").value =
-        data.season || "";
-
-      document.getElementById("notes").value =
-        data.notes || "";
-    }
-
-  } catch (error) {
-
-    document.getElementById("status").innerText =
-      error.message;
-
+    await setDoc(doc(db, "answers", currentUser.uid), data);
+    window.location.href = "next.html";
+  } catch (e) {
+    alert(e.message);
   }
 
 });
-
-document.getElementById("saveBtn")
-.addEventListener("click", async () => {
-
-  const seriesName =
-    document.getElementById("seriesName").value.trim();
-
-  const episode =
-    document.getElementById("episode").value;
-
-  const season =
-    document.getElementById("season").value;
-
-  const notes =
-    document.getElementById("notes").value.trim();
-
-  if (!seriesName) {
-    document.getElementById("status").innerText =
-      "يرجى إدخال اسم المسلسل";
-    return;
-  }
-
-  if (!episode) {
-    document.getElementById("status").innerText =
-      "يرجى اختيار الحلقة";
-    return;
-  }
-
-  if (!season) {
-    document.getElementById("status").innerText =
-      "يرجى إدخال الموسم";
-    return;
-  }
-
-  try {
-
-    await setDoc(doc(db, "users", currentUser.uid), {
-
-      seriesName: seriesName,
-      episode: episode,
-      season: season,
-      notes: notes
-
-    });
-
-    document.getElementById("status").innerText =
-      "تم الحفظ بنجاح";
-
-  } catch (error) {
-
-    document.getElementById("status").innerText =
-      error.message;
-
-  }
-
-});
-
-document.getElementById("logoutBtn")
-.addEventListener("click", async () => {
-
-  await signOut(auth);
-
-  window.location.href = "login.html";
-
-});
-
 </script>
 
 </body>
