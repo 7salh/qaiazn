@@ -66,7 +66,7 @@ const auth = getAuth(app);
 
 let currentUser = null;
 
-// إظهار عدد الأبناء
+// إظهار عدد الأبناء عند المتزوج
 document.getElementById("status").addEventListener("change", function () {
   document.getElementById("childrenBox").style.display =
     this.value === "married" ? "block" : "none";
@@ -80,7 +80,9 @@ onAuthStateChanged(auth, (user) => {
 // زر الحفظ
 document.getElementById("save").addEventListener("click", async () => {
 
-  if (!currentUser) {
+  const user = auth.currentUser;
+
+  if (!user) {
     alert("يجب تسجيل دخول");
     return;
   }
@@ -98,7 +100,10 @@ document.getElementById("save").addEventListener("click", async () => {
   };
 
   try {
-    await setDoc(doc(db, "answers", currentUser.uid), data);
+
+    await setDoc(doc(db, "answers", user.uid), data);
+
+    alert("تم الحفظ بنجاح");
 
     window.location.href = "next.html";
 
