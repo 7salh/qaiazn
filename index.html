@@ -32,19 +32,17 @@
 <input type="number" id="children"><br><br>
 </div>
 
-<hr>
+<p>كيف حالك النفسية؟</p>
+<input id="q1"><br><br>
 
-<p>كيف تصف حالتك النفسية اليوم؟</p>
-<input type="text" id="q1"><br><br>
+<p>هل تشارك مشاعرك؟</p>
+<input id="q2"><br><br>
 
-<p>هل تفضل مشاركة مشاعرك مع الآخرين؟</p>
-<input type="text" id="q2"><br><br>
+<p>هل عندك ضغوط؟</p>
+<input id="q3"><br><br>
 
-<p>هل تعاني من ضغوط متكررة؟</p>
-<input type="text" id="q3"><br><br>
-
-<p>هل تجد صعوبة في التعبير عن مشاعرك؟</p>
-<input type="text" id="q4"><br><br>
+<p>هل صعوبة بالتعبير؟</p>
+<input id="q4"><br><br>
 
 <button id="save">حفظ</button>
 
@@ -66,18 +64,19 @@ const auth = getAuth(app);
 
 let currentUser = null;
 
-// إظهار عدد الأبناء عند المتزوج
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+
+  if (!user) {
+    window.location.href = "login.html";
+  }
+});
+
 document.getElementById("status").addEventListener("change", function () {
   document.getElementById("childrenBox").style.display =
     this.value === "married" ? "block" : "none";
 });
 
-// معرفة المستخدم
-onAuthStateChanged(auth, (user) => {
-  currentUser = user;
-});
-
-// زر الحفظ
 document.getElementById("save").addEventListener("click", async () => {
 
   const user = auth.currentUser;
@@ -99,17 +98,9 @@ document.getElementById("save").addEventListener("click", async () => {
     updatedAt: new Date().toISOString()
   };
 
-  try {
+  await setDoc(doc(db, "answers", user.uid), data);
 
-    await setDoc(doc(db, "answers", user.uid), data);
-
-    alert("تم الحفظ بنجاح");
-
-    window.location.href = "next.html";
-
-  } catch (error) {
-    alert(error.message);
-  }
+  window.location.href = "next.html";
 
 });
 
