@@ -2,54 +2,15 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>استبيان</title>
+<title>Loading</title>
 </head>
 <body>
 
-<h2>استبيان</h2>
-
-<label>الجنس</label><br>
-<select id="gender">
-  <option value="">اختر</option>
-  <option value="male">ذكر</option>
-  <option value="female">أنثى</option>
-</select>
-<br><br>
-
-<label>العمر</label><br>
-<input type="number" id="age"><br><br>
-
-<label>الحالة الاجتماعية</label><br>
-<select id="status">
-  <option value="">اختر</option>
-  <option value="single">أعزب</option>
-  <option value="married">متزوج</option>
-</select>
-<br><br>
-
-<div id="childrenBox" style="display:none;">
-<label>عدد الأبناء</label><br>
-<input type="number" id="children"><br><br>
-</div>
-
-<p>كيف حالك النفسية؟</p>
-<input id="q1"><br><br>
-
-<p>هل تشارك مشاعرك؟</p>
-<input id="q2"><br><br>
-
-<p>هل عندك ضغوط؟</p>
-<input id="q3"><br><br>
-
-<p>هل صعوبة بالتعبير؟</p>
-<input id="q4"><br><br>
-
-<button id="save">حفظ</button>
+<h3>جاري التحميل...</h3>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -59,48 +20,15 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
 
-let currentUser = null;
-
 onAuthStateChanged(auth, (user) => {
-  currentUser = user;
 
-  if (!user) {
+  if (user) {
+    window.location.href = "index.html"; 
+  } else {
     window.location.href = "login.html";
   }
-});
-
-document.getElementById("status").addEventListener("change", function () {
-  document.getElementById("childrenBox").style.display =
-    this.value === "married" ? "block" : "none";
-});
-
-document.getElementById("save").addEventListener("click", async () => {
-
-  const user = auth.currentUser;
-
-  if (!user) {
-    alert("يجب تسجيل دخول");
-    return;
-  }
-
-  const data = {
-    gender: document.getElementById("gender").value,
-    age: document.getElementById("age").value,
-    status: document.getElementById("status").value,
-    children: document.getElementById("children").value || 0,
-    q1: document.getElementById("q1").value,
-    q2: document.getElementById("q2").value,
-    q3: document.getElementById("q3").value,
-    q4: document.getElementById("q4").value,
-    updatedAt: new Date().toISOString()
-  };
-
-  await setDoc(doc(db, "answers", user.uid), data);
-
-  window.location.href = "next.html";
 
 });
 
