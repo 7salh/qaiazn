@@ -12,7 +12,7 @@ body{
     background:#f4f7fb;
 }
 
-/* ===== Splash ===== */
+/* Splash */
 #splash{
     position:fixed;
     width:100%;
@@ -28,22 +28,8 @@ body{
 
 #splash img{
     width:140px;
-    animation: float 2s infinite ease-in-out;
 }
 
-@keyframes float{
-    0%{transform:translateY(0);}
-    50%{transform:translateY(-15px);}
-    100%{transform:translateY(0);}
-}
-
-#splash h2{
-    margin-top:15px;
-    color:#444;
-    font-weight:normal;
-}
-
-/* ===== Main ===== */
 .container{
     display:none;
     height:100vh;
@@ -56,68 +42,32 @@ body{
     width:350px;
     padding:25px;
     border-radius:16px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
     text-align:center;
-}
-
-.card h2{
-    margin-bottom:15px;
-    color:#333;
 }
 
 input{
     width:90%;
     padding:12px;
     margin:8px 0;
-    border:1px solid #ddd;
-    border-radius:10px;
-    outline:none;
-    transition:0.3s;
-}
-
-input:focus{
-    border-color:#6bbcff;
-    box-shadow:0 0 5px rgba(107,188,255,0.4);
 }
 
 button{
     width:95%;
     padding:12px;
-    margin-top:10px;
-    border:none;
-    border-radius:10px;
     background:#4a90e2;
     color:white;
-    font-size:15px;
+    border:none;
     cursor:pointer;
-    transition:0.3s;
-}
-
-button:hover{
-    background:#357fd8;
-}
-
-a{
-    display:block;
-    margin-top:12px;
-    color:#4a90e2;
-    text-decoration:none;
-}
-
-#result{
-    margin-top:10px;
-    font-size:14px;
-    color:#d9534f;
 }
 </style>
-
 </head>
+
 <body>
 
 <!-- Splash -->
 <div id="splash">
-    <img src="https://cdn-icons-png.flaticon.com/512/3048/3048122.png" alt="yoga">
-    <h2>Welcome back… breathe in</h2>
+    <img src="https://cdn-icons-png.flaticon.com/512/3048/3048122.png">
+    <h2>Welcome</h2>
 </div>
 
 <!-- Main -->
@@ -126,14 +76,12 @@ a{
 
         <h2>Login</h2>
 
-        <input type="email" id="email" placeholder="Email"><br>
-        <input type="password" id="password" placeholder="Password"><br>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
 
         <button onclick="login()">Login</button>
 
         <p id="result"></p>
-
-        <a href="signup.html">Create Account</a>
 
     </div>
 </div>
@@ -159,7 +107,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// auto redirect if logged in
+// إذا مسجل دخول → يروح مباشرة
 onAuthStateChanged(auth, (user) => {
   if (user) {
     window.location.href = "index.html";
@@ -168,14 +116,17 @@ onAuthStateChanged(auth, (user) => {
 
 window.login = async function () {
 
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const result = document.getElementById("result");
 
   try {
 
     await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "index.html";
+
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 500);
 
   } catch (error) {
     result.innerText = error.message;
@@ -183,16 +134,11 @@ window.login = async function () {
 
 };
 
-/* Splash control */
-setTimeout(()=>{
-    document.getElementById("splash").style.opacity="0";
-
-    setTimeout(()=>{
-        document.getElementById("splash").style.display="none";
-        document.getElementById("main").style.display="flex";
-    },1000);
-
-},2500);
+// splash
+setTimeout(() => {
+  document.getElementById("splash").style.display = "none";
+  document.getElementById("main").style.display = "flex";
+}, 2500);
 
 </script>
 
