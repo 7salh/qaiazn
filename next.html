@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>رسائل</title>
+</head>
+<body>
+
+<h2>رسالة من المشرف</h2>
+<p id="adminMessage">جاري التحميل...</p>
+
+<hr>
+
+<h3>اكتب رسالتك</h3>
+
+<textarea id="userMessage" rows="5" cols="40"></textarea><br><br>
+
+<button id="sendBtn">إرسال</button>
+
+<p id="status"></p>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// جلب رسالة المشرف
+async function loadAdminMessage() {
+
+  const docRef = doc(db, "settings", "adminMessage");
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    document.getElementById("adminMessage").innerText =
+      docSnap.data().text;
+  } else {
+    document.getElementById("adminMessage").innerText =
+      "لا توجد رسالة حالياً";
+  }
+}
+
+loadAdminMessage();
+
+// إرسال رسالة المستخدم
+document.getElementById("sendBtn").addEventListener("click", async () => {
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("يجب تسجيل الدخول");
+    return;
+  }
+
+  const text = document.getElementById("userMessage").value.trim();
+
+  if (!text) {
+    alert("اكتب رسالة أولاً");
+    return;
+  }
+
+  try {
+
+    await addDoc(collection(db, "messages"), {
+      uid: user.uid,
+      message: text,
+      createdAt: new Date().toISOString()
+    });
+
+    document.getElementById("status").innerText =
+      "تم إرسال الرسالة";
+
+    document.getElementById("userMessage").value = "";
+
+  } catch (e) {
+    alert(e.message);
+  }
+
+});
+
+</script>
+
+</body>
+</html>
