@@ -58,8 +58,14 @@ window.signup = async function () {
     return;
   }
 
-  if (!/^05\\d{8}$/.test(phone)) {
+  // يجب أن يبدأ بـ 05 ويتكون من 10 أرقام
+  if (!/^05\d{8}$/.test(phone)) {
     result.innerText = "Phone must start with 05 and be 10 digits";
+    return;
+  }
+
+  if (!email) {
+    result.innerText = "Please enter email";
     return;
   }
 
@@ -89,7 +95,9 @@ window.signup = async function () {
     }, 1000);
 
   } catch (error) {
+
     result.innerText = error.message;
+
   }
 
 };
