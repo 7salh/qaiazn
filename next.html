@@ -1,1 +1,185 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f4f7fb;
+}
+
+.container{
+    width:90%;
+    max-width:600px;
+    margin:40px auto;
+}
+
+h2{
+    text-align:center;
+}
+
+.message{
+    background:white;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:10px;
+}
+
+textarea{
+    width:100%;
+    height:120px;
+    padding:12px;
+    box-sizing:border-box;
+    margin-top:20px;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:10px;
+    background:#4a90e2;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+#status{
+    text-align:center;
+    margin-top:15px;
+    color:green;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Messages</h2>
+
+    <div id="messages"></div>
+
+    <textarea id="reply" placeholder="Write your message"></textarea>
+
+    <button onclick="sendMessage()">Send</button>
+
+    <p id="status"></p>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAxjQs2ujCOdp78runJQW8GJBOc5i0kloc",
+  authDomain: "qaiazn.firebaseapp.com",
+  projectId: "qaiazn",
+  storageBucket: "qaiazn.firebasestorage.app",
+  messagingSenderId: "944780637686",
+  appId: "1:944780637686:web:5d30ca54a2bc76ec7b43d7"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, async(user)=>{
+
+    if(!user){
+        window.location.href = "login.html";
+        return;
+    }
+
+    currentUser = user;
+
+    loadMessages();
+
+});
+
+async function loadMessages(){
+
+    const messagesDiv = document.getElementById("messages");
+
+    messagesDiv.innerHTML = "";
+
+    const q = query(
+        collection(db,"messages"),
+        where("userId","==",currentUser.uid),
+        where("sender","==","admin"),
+        orderBy("timestamp","asc")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc)=>{
+
+        const data = doc.data();
+
+        const box = document.createElement("div");
+
+        box.className = "message";
+
+        box.innerText = data.text;
+
+        messagesDiv.appendChild(box);
+
+    });
+
+}
+
+window.sendMessage = async function(){
+
+    const text = document.getElementById("reply").value;
+
+    const status = document.getElementById("status");
+
+    if(text.trim() == ""){
+        return;
+    }
+
+    await addDoc(collection(db,"messages"),{
+
+        userId: currentUser.uid,
+        sender: "user",
+        text: text,
+        timestamp: Date.now()
+
+    });
+
+    document.getElementById("reply").value = "";
+
+    status.innerText = "تم إرسال الرسالة";
+
+}
+
+</script>
+
+</body>
+</html>
