@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Questions</title>
+<title>Home - Questions</title>
 
 <style>
 
@@ -19,7 +18,7 @@ body{
 }
 
 .container{
-    width:400px;
+    width:420px;
     background:white;
     padding:25px;
     border-radius:16px;
@@ -31,12 +30,12 @@ h2{
 }
 
 .question{
-    margin-bottom:18px;
+    margin-bottom:15px;
 }
 
 label{
     display:block;
-    margin-bottom:8px;
+    margin-bottom:6px;
     font-weight:bold;
 }
 
@@ -49,11 +48,11 @@ input{
 button{
     width:100%;
     padding:14px;
-    border:none;
+    margin-top:10px;
     background:#4a90e2;
     color:white;
+    border:none;
     cursor:pointer;
-    margin-top:10px;
 }
 
 </style>
@@ -71,35 +70,33 @@ button{
     </div>
 
     <div class="question">
-        <label>2. كيف كان نومك الليلة الماضية؟</label>
+        <label>2. كيف كان نومك؟</label>
         <input type="text" id="q2">
     </div>
 
     <div class="question">
-        <label>3. هل تشعر بضغط نفسي هذه الفترة؟</label>
+        <label>3. هل تشعر بضغط نفسي؟</label>
         <input type="text" id="q3">
     </div>
 
     <div class="question">
-        <label>4. هل لديك رغبة في التحدث مع أحد؟</label>
+        <label>4. هل ترغب بالتحدث مع أحد؟</label>
         <input type="text" id="q4">
     </div>
 
     <div class="question">
-        <label>5. ما أكثر شعور يرافقك اليوم؟</label>
+        <label>5. ما شعورك الغالب اليوم؟</label>
         <input type="text" id="q5">
     </div>
 
-    <button onclick="save()">Save</button>
+    <button onclick="save()">التالي</button>
 
 </div>
 
 <script>
 
 function save(){
-
     window.location.href = "next.html";
-
 }
 
 </script>
