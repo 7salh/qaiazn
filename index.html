@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f4f7fb;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.container{
+    width:400px;
+    background:white;
+    padding:25px;
+    border-radius:16px;
+}
+
+h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+input,
+select{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    background:#4a90e2;
+    color:white;
+    cursor:pointer;
+}
+
+#result{
+    text-align:center;
+    margin-top:15px;
+    color:red;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Create Account</h2>
+
+    <input type="text" id="fullname" placeholder="Full Name">
+
+    <input type="number" id="age" placeholder="Age">
+
+    <select id="status" onchange="checkStatus()">
+        <option value="">Marital Status</option>
+        <option value="single">Single</option>
+        <option value="married">Married</option>
+    </select>
+
+    <div id="childrenBox" style="display:none;">
+        <input type="number" id="children" placeholder="Number of Children">
+    </div>
+
+    <input type="text" id="phone" placeholder="Phone Number">
+
+    <input type="email" id="email" placeholder="Email">
+
+    <input type="password" id="password" placeholder="Password">
+
+    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+
+    <button onclick="register()">Create Account</button>
+
+    <p id="result"></p>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAxjQs2ujCOdp78runJQW8GJBOc5i0kloc",
+  authDomain: "qaiazn.firebaseapp.com",
+  projectId: "qaiazn",
+  storageBucket: "qaiazn.firebasestorage.app",
+  messagingSenderId: "944780637686",
+  appId: "1:944780637686:web:5d30ca54a2bc76ec7b43d7"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+window.checkStatus = function(){
+
+    const status = document.getElementById("status").value;
+
+    const childrenBox = document.getElementById("childrenBox");
+
+    if(status === "married"){
+        childrenBox.style.display = "block";
+    }else{
+        childrenBox.style.display = "none";
+    }
+
+}
+
+window.register = async function(){
+
+    const fullname = document.getElementById("fullname").value;
+
+    const age = document.getElementById("age").value;
+
+    const status = document.getElementById("status").value;
+
+    const children = document.getElementById("children").value;
+
+    const phone = document.getElementById("phone").value;
+
+    const email = document.getElementById("email").value;
+
+    const password = document.getElementById("password").value;
+
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    const result = document.getElementById("result");
+
+    if(password !== confirmPassword){
+
+        result.innerText = "Passwords do not match";
+
+        return;
+
+    }
+
+    try{
+
+        const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+        const user = userCredential.user;
+
+        await setDoc(doc(db,"users",user.uid),{
+
+            fullname: fullname,
+            age: age,
+            maritalStatus: status,
+            children: children,
+            phone: phone,
+            email: email
+
+        });
+
+        window.location.href = "questions.html";
+
+    }catch(error){
+
+        result.innerText = error.message;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
