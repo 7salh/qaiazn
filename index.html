@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Account</title>
+<title>إنشاء حساب</title>
 
 <style>
 
@@ -29,27 +29,37 @@ h2{
     margin-bottom:20px;
 }
 
-input,
-select{
+input, select{
     width:100%;
     padding:12px;
-    margin-bottom:15px;
+    margin-bottom:12px;
     box-sizing:border-box;
 }
 
 button{
     width:100%;
     padding:14px;
-    border:none;
     background:#4a90e2;
     color:white;
+    border:none;
     cursor:pointer;
 }
 
 #result{
     text-align:center;
-    margin-top:15px;
+    margin-top:10px;
     color:red;
+}
+
+.link{
+    margin-top:10px;
+    text-align:center;
+}
+
+.link a{
+    color:#4a90e2;
+    cursor:pointer;
+    text-decoration:none;
 }
 
 </style>
@@ -59,31 +69,31 @@ button{
 
 <div class="container">
 
-    <h2>Create Account</h2>
+    <h2>إنشاء حساب</h2>
 
-    <input type="text" id="fullname" placeholder="Full Name">
-
-    <input type="number" id="age" placeholder="Age">
+    <input type="text" id="fullname" placeholder="الاسم الثلاثي">
+    <input type="number" id="age" placeholder="العمر">
 
     <select id="status" onchange="checkStatus()">
-        <option value="">Marital Status</option>
-        <option value="single">Single</option>
-        <option value="married">Married</option>
+        <option value="">الحالة الاجتماعية</option>
+        <option value="single">أعزب</option>
+        <option value="married">متزوج</option>
     </select>
 
     <div id="childrenBox" style="display:none;">
-        <input type="number" id="children" placeholder="Number of Children">
+        <input type="number" id="children" placeholder="عدد الأبناء">
     </div>
 
-    <input type="text" id="phone" placeholder="Phone Number">
+    <input type="text" id="phone" placeholder="رقم الهاتف">
+    <input type="email" id="email" placeholder="البريد الإلكتروني">
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <input type="password" id="confirmPassword" placeholder="إعادة كلمة المرور">
 
-    <input type="email" id="email" placeholder="Email">
+    <button onclick="register()">CREATE ACCOUNT</button>
 
-    <input type="password" id="password" placeholder="Password">
-
-    <input type="password" id="confirmPassword" placeholder="Confirm Password">
-
-    <button onclick="register()">Create Account</button>
+    <div class="link">
+        هل لديك حساب؟ <a onclick="goLogin()">تسجيل الدخول</a>
+    </div>
 
     <p id="result"></p>
 
@@ -92,17 +102,8 @@ button{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-
-import {
-  getAuth,
-  createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAxjQs2ujCOdp78runJQW8GJBOc5i0kloc",
@@ -114,82 +115,61 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getFirestore(app);
 
 window.checkStatus = function(){
 
     const status = document.getElementById("status").value;
-
-    const childrenBox = document.getElementById("childrenBox");
+    const box = document.getElementById("childrenBox");
 
     if(status === "married"){
-        childrenBox.style.display = "block";
+        box.style.display = "block";
     }else{
-        childrenBox.style.display = "none";
+        box.style.display = "none";
     }
-
 }
 
 window.register = async function(){
 
     const fullname = document.getElementById("fullname").value;
-
     const age = document.getElementById("age").value;
-
     const status = document.getElementById("status").value;
-
     const children = document.getElementById("children").value;
-
     const phone = document.getElementById("phone").value;
-
     const email = document.getElementById("email").value;
-
     const password = document.getElementById("password").value;
-
     const confirmPassword = document.getElementById("confirmPassword").value;
-
     const result = document.getElementById("result");
 
     if(password !== confirmPassword){
-
-        result.innerText = "Passwords do not match";
-
+        result.innerText = "كلمات المرور غير متطابقة";
         return;
-
     }
 
     try{
 
-        const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
-
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
         await setDoc(doc(db,"users",user.uid),{
-
-            fullname: fullname,
-            age: age,
-            maritalStatus: status,
-            children: children,
-            phone: phone,
-            email: email
-
+            fullname,
+            age,
+            status,
+            children,
+            phone,
+            email
         });
 
-        window.location.href = "questions.html";
+        window.location.href = "home.html";
 
     }catch(error){
-
         result.innerText = error.message;
-
     }
+}
 
+window.goLogin = function(){
+    window.location.href = "login.html";
 }
 
 </script>
