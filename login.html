@@ -12,7 +12,6 @@ body{
     background:#f4f7fb;
 }
 
-/* Splash */
 #splash{
     position:fixed;
     width:100%;
@@ -22,7 +21,6 @@ body{
     flex-direction:column;
     justify-content:center;
     align-items:center;
-    transition:1s ease;
     z-index:999;
 }
 
@@ -59,6 +57,11 @@ button{
     border:none;
     cursor:pointer;
 }
+
+#result{
+    margin-top:10px;
+    color:red;
+}
 </style>
 </head>
 
@@ -79,7 +82,7 @@ button{
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
 
-        <button onclick="login()">Login</button>
+        <button onclick="login()">LOGIN</button>
 
         <p id="result"></p>
 
@@ -107,10 +110,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// إذا مسجل دخول → يروح مباشرة
+// إذا المستخدم مسجل دخول → يذهب للـ home
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    window.location.href = "index.html";
+    window.location.href = "home.html";
   }
 });
 
@@ -124,9 +127,7 @@ window.login = async function () {
 
     await signInWithEmailAndPassword(auth, email, password);
 
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 500);
+    window.location.href = "home.html";
 
   } catch (error) {
     result.innerText = error.message;
@@ -134,7 +135,7 @@ window.login = async function () {
 
 };
 
-// splash
+// splash screen
 setTimeout(() => {
   document.getElementById("splash").style.display = "none";
   document.getElementById("main").style.display = "flex";
